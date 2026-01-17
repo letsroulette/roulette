@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>룰렛</title>
+<meta name="google-site-verification" content=kM279TnBVeGR8_GDQw7A9NS_Zykr0Axk3SBEhcZFR1U />
+<style>
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+canvas {
+    margin-top: 20px;
+}
+.item {
+    margin: 4px;
+}
+.item button {
+    margin-left: 6px;
+    cursor: pointer;
+}
+.controls button {
+    margin: 4px;
+}
+</style>
+</head>
+<body>
+
+<h2>🎡 룰렛</h2>
+
+<input id="itemInput" placeholder="항목 입력">
+<div class="controls">
+    <button onclick="addItem()">추가</button>
+    <button onclick="resetAll()">전체 초기화</button>
+</div>
+
+<div id="list"></div>
+
+<canvas id="c" width="400" height="400"></canvas><br>
+<button onclick="spin()">돌리기</button>
+
+<h3 id="result"></h3>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+const CX = 200, CY = 200, R = 180;
+const POINTER = -Math.PI / 2;
+
+let items = [];
+let angle = 0;
+let spinning = false;
+
+/* 엔터로 항목 추가 */
+itemInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") addItem();
+});
+
+function draw() {
+    ctx.clearRect(0, 0, 400, 400);
+
+    const count = items.length || 6;
+    const slice = Math.PI * 2 / count;
+
+    for (let i = 0; i < count; i++) {
+        const start = angle + i * slice;
+        const end = start + slice;
+
+        ctx.beginPath();
+        ctx.moveTo(CX, CY);
+        ctx.arc(CX, CY, R, start, end);
+        ctx.closePath();
+
+        ctx.fillStyle = items.length
+            ? `hsl(${i * 360 / items.length}, 70%, 60%)`
+            : `hsl(${i * 360 / count}, 70%, 70%)`;
+
+        ctx.fill();
+
+        if (items[i]) {
+            const mid = start + slice / 2;
+            const tx = CX + Math.cos(mid) * R * 0.6;
+            const ty = CY + Math.sin(mid) * R * 0.6;
+
+            ctx.save();
+            ctx.translate(tx, ty);
+
+            let rotateAngle = mid;
+            if (rotateAngle > Math.PI / 2 && rotateAngle < Math.PI * 1.5) {
+                rotateAngle += Math.PI; // 글씨 뒤집힘 방지
+            }
+            ctx.rotate(rotateAngle);
+
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#000";
+
+            let size = 22;
+            ctx.font = size + "px Arial";
+            while (
+                ctx.measureText(items[i]).width > R * slice * 0.8 &&
+                size > 10
+            ) {
+                size--;
+                ctx.font = size + "px Arial";
+            }
+
+            ctx.fillText(items[i], 0, 0);
+            ctx.restore();
+        }
+    }
+
+    // ▼ 역삼각형 당첨 핀
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(CX - 14, 15);
+    ctx.lineTo(CX + 14, 15);
+    ctx.lineTo(CX, 45);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function updateList() {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
+    if (!items.length) return;
+
+    const p = Math.round((100 / items.length) * 10) / 10;
+
+    items.forEach((t, i) => {
+        const d = document.createElement("div");
+        d.className = "item";
+        d.innerHTML = `
+            ${t} (${p}%)
+            <button onclick="removeItem(${i})">❌</button>
+        `;
+        list.appendChild(d);
+    });
+}
+
+function addItem() {
+    if (!itemInput.value.trim()) return;
+    items.push(itemInput.value.trim());
+    itemInput.value = "";
+    updateList();
+    draw();
+}
+
+function removeItem(index) {
+    items.splice(index, 1);
+    updateList();
+    draw();
+}
+
+function resetAll() {
+    items = [];
+    angle = 0;
+    spinning = false;
+    document.getElementById("result").textContent = "";
+    updateList();
+    draw();
+}
+
+function spin() {
+    if (spinning || !items.length) return;
+    spinning = true;
+    document.getElementById("result").textContent = "";
+
+    let speed = Math.random() * 0.5 + 0.6;
+    let frames = 0;
+
+    function anim() {
+        angle += speed;
+        speed *= 0.985;
+        frames++;
+        draw();
+
+        if (frames < 320) {
+            requestAnimationFrame(anim);
+        } else {
+            spinning = false;
+            const slice = Math.PI * 2 / items.length;
+            let a = (POINTER - angle) % (Math.PI * 2);
+            if (a < 0) a += Math.PI * 2;
+            const idx = Math.floor(a / slice);
+            document.getElementById("result").textContent =
+                "🎉 당첨: " + items[idx];
+        }
+    }
+    anim();
+}
+
+draw();
+</script>
+
+</body>
+</html>
