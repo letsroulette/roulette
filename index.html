@@ -142,13 +142,17 @@ function draw() {
     }
 
     // ▼ 역삼각형 당첨 핀
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.moveTo(CX - 14, 15);
-    ctx.lineTo(CX + 14, 15);
-    ctx.lineTo(CX, 45);
-    ctx.closePath();
-    ctx.fill();
+   // ▼ 당첨 핀 (룰렛 원 위쪽)
+const pinY = CY - R - 10; // 원보다 위
+
+ctx.fillStyle = "red";
+ctx.beginPath();
+ctx.moveTo(CX - 14, pinY);
+ctx.lineTo(CX + 14, pinY);
+ctx.lineTo(CX, pinY + 30);
+ctx.closePath();
+ctx.fill();
+
 }
 
 function updateList() {
@@ -233,5 +237,6 @@ resizeCanvas();
 
 </body>
 </html>
+
 
 
