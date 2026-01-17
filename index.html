@@ -266,7 +266,7 @@ function spin() {
             const idx = Math.floor(a / slice);
             document.getElementById("result").textContent =
                 "🎉 당첨: " + items[idx];
-            addHistory("🎯 " + items[idx]);
+            addHistory(items[idx]);
 
         }
     }
@@ -286,6 +286,7 @@ window.addEventListener("resize", () => {
 
 </body>
 </html>
+
 
 
 
