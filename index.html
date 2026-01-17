@@ -2,8 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">    
 <title>룰렛</title>
-<meta name="google-site-verification" content=kM279TnBVeGR8_GDQw7A9NS_Zykr0Axk3SBEhcZFR1U />
+<meta name="google-site-verification" content="kM279TnBVeGR8_GDQw7A9NS_Zykr0Axk3SBEhcZFR1U" />
 <style>
 body {
     text-align: center;
@@ -22,6 +23,11 @@ canvas {
 .controls button {
     margin: 4px;
 }
+canvas {
+    width: 90vw;
+    max-width: 400px;
+    height: auto;
+}    
 </style>
 </head>
 <body>
@@ -36,16 +42,22 @@ canvas {
 
 <div id="list"></div>
 
-<canvas id="c" width="400" height="400"></canvas><br>
+<canvas id="c"></canvas><br>
 <button onclick="spin()">돌리기</button>
 
 <h3 id="result"></h3>
 
 <script>
-const canvas = document.getElementById("c");
+ const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
 
-const CX = 200, CY = 200, R = 180;
+function resizeCanvas() {
+    const size = Math.min(window.innerWidth * 0.9, 400);
+    canvas.width = size;
+    canvas.height = size;
+}
+
+
 const POINTER = -Math.PI / 2;
 
 let items = [];
@@ -58,7 +70,11 @@ itemInput.addEventListener("keydown", e => {
 });
 
 function draw() {
-    ctx.clearRect(0, 0, 400, 400);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const CX = canvas.width / 2;
+    const CY = canvas.height / 2;
+    const R = canvas.width * 0.45;
 
     const count = items.length || 6;
     const slice = Math.PI * 2 / count;
@@ -192,7 +208,15 @@ function spin() {
 }
 
 draw();
+window.addEventListener("resize", () => {
+    resizeCanvas();
+    draw();
+});
+
+resizeCanvas();
+    
 </script>
 
 </body>
 </html>
+
