@@ -55,6 +55,38 @@ button {
     font-size: 17px;
     color: #777;
 }
+#historyBox {
+    border-top: 1px solid #eee;
+    margin-top: 12px;
+    padding-top: 8px;
+}
+
+#history {
+    font-size: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#history div {
+    margin: 4px 0;
+}
+
+/* 💻 PC 화면: 오른쪽 고정 */
+@media (min-width: 768px) {
+    body {
+        display: grid;
+        grid-template-columns: 1fr 260px;
+        gap: 20px;
+        align-items: start;
+    }
+
+    #historyBox {
+        border-top: none;
+        border-left: 1px solid #eee;
+        padding-left: 12px;
+        margin-top: 80px;
+    }
+}
    
 </style>
 </head>
@@ -76,6 +108,11 @@ button {
 <button onclick="spin()">돌리기</button>
 
 <h3 id="result"></h3>
+<div id="historyBox">
+    <h4>📜 결과 히스토리</h4>
+    <div id="history"></div>
+</div>
+    
 
 <script>
  const canvas = document.getElementById("c");
@@ -93,6 +130,14 @@ const POINTER = -Math.PI / 2;
 let items = [];
 let angle = 0;
 let spinning = false;
+
+function addHistory(text) {
+    const h = document.getElementById("history");
+    const d = document.createElement("div");
+    d.textContent = text;
+    h.prepend(d); // 최신이 위로
+}
+    
 
 /* 엔터로 항목 추가 */
 itemInput.addEventListener("keydown", e => {
@@ -236,6 +281,8 @@ function spin() {
             const idx = Math.floor(a / slice);
             document.getElementById("result").textContent =
                 "🎉 당첨: " + items[idx];
+            addHistory("🎯 " + items[idx]);
+
         }
     }
     anim();
@@ -254,6 +301,7 @@ window.addEventListener("resize", () => {
 
 </body>
 </html>
+
 
 
 
